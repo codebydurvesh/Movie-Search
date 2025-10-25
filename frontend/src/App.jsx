@@ -5,10 +5,12 @@ import Favorites from "./pages/Favorites";
 import NotFound from "./pages/NotFound";
 import NavBar from "./components/NavBar";
 import { MovieProvider } from "./contexts/MovieContext";
+import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   return (
     <MovieProvider>
+      <ScrollToTop />
       <NavBar />
       <main className="main-content">
         <Routes>
