@@ -1,85 +1,150 @@
 import MovieCard from "../components/MovieCard.jsx";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { searchMovies, getPopularMovies } from "../services/api.js";
-import "../css/Home.css"
+import "../css/Home.css";
 
 function Home() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [movies, setMovies] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
+  const observer = useRef();
 
-    const [searchQuery, setSearchQuery] = useState("");
-    const [movies, setMovies] = useState([]);
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true);
+  // Last movie element ref callback
+  const lastMovieElementRef = useCallback(
+    (node) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
 
-    useEffect(() => {
-        const loadPopularMovies = async () => {
-            try {
-                const popularMovies = await getPopularMovies();
-                setMovies(popularMovies);
-            } catch (err) {
-                console.log(err);
-                setError("Failed to load movies...")
-            }
-            finally {
-                setLoading(false)
-            }
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          loadMoreMovies();
         }
+      });
 
-        loadPopularMovies()
-    },[])
+      if (node) observer.current.observe(node);
+    },
+    [loading, hasMore]
+  );
 
-    const movie =[
-        {id:1 , title:"John Wick", release_date: "2020"},
-        {id:2 , title:"Terminator", release_date: "1999"},
-        {id:3 , title:"The Matrix", release_date: "1998"},
-    ]
+  const loadMoreMovies = async () => {
+    if (loading || !hasMore) return;
 
-    const handleSearch = async (e) => {
-        e.preventDefault()
-        if(!searchQuery.trim()) return 
-        if (loading) return
+    setLoading(true);
+    try {
+      const data = isSearching
+        ? await searchMovies(searchQuery, page)
+        : await getPopularMovies(page);
 
-        setLoading(true)
-        try{    
-            const searchResults = await searchMovies(searchQuery)
-            setMovies(searchResults)
-            setError(null)
-        } catch(err) {
-            console.log(err)
-            setError("Failed to search movies...")
-        } finally {
-            setLoading(false)
-        }
+      if (data.results.length === 0) {
+        setHasMore(false);
+        return;
+      }
 
-    };
+      // Filter out duplicates
+      const newMovies = data.results.filter(
+        (newMovie) =>
+          !movies.some((existingMovie) => existingMovie.id === newMovie.id)
+      );
 
-    return(
-        <div className="home">
+      setMovies((prevMovies) => [...prevMovies, ...newMovies]);
+      setPage((prevPage) => prevPage + 1);
+      setHasMore(page < data.total_pages);
+    } catch (err) {
+      console.log(err);
+      setError("Failed to load more movies...");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            <form onSubmit={handleSearch} className="search-form">
-                <input
-                     type="text" 
-                     placeholder="Search for movies..." 
-                     className="search-input"
-                     value={searchQuery}
-                     onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                <button type="submit" className="search-button">Search</button>
-            </form>
+  // Initial load
+  useEffect(() => {
+    setLoading(true);
+    getPopularMovies(1)
+      .then((data) => {
+        setMovies(data.results);
+        setPage(2);
+        setHasMore(page < data.total_pages);
+      })
+      .catch((err) => {
+        console.log(err);
+        setError("Failed to load movies...");
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
-            {error && <div className="error-message">{error}</div>}
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    if (loading) return;
 
-            {loading ? (<div className="loading">Loading...</div>) : (
-                <div className="movies-grid">
-                    {movies.map((movie) =>(
-                        <MovieCard movie={movie} key={movie.id}/>
-                    ))}
-                </div>
-            )}
+    setLoading(true);
+    setIsSearching(true);
+    setPage(1);
+    setMovies([]);
 
+    try {
+      const data = await searchMovies(searchQuery, 1);
+      setMovies(data.results);
+      setPage(2);
+      setHasMore(data.total_pages > 1);
+      setError(null);
+    } catch (err) {
+      console.log(err);
+      setError("Failed to search movies...");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  return (
+    <div className="home">
+      <form onSubmit={handleSearch} className="search-form">
+        <input
+          type="text"
+          placeholder="Search for movies..."
+          className="search-input"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <button type="submit" className="search-button">
+          Search
+        </button>
+      </form>
+
+      {error && <div className="error-message">{error}</div>}
+
+      <div className="movies-grid">
+        {movies.map((movie, index) => (
+          <div
+            key={movie.id}
+            ref={index === movies.length - 1 ? lastMovieElementRef : null}
+          >
+            <MovieCard movie={movie} />
+          </div>
+        ))}
+      </div>
+
+      {loading && (
+        <div
+          className="loading"
+          style={{ textAlign: "center", padding: "2rem" }}
+        >
+          Loading more movies...
         </div>
-    );
+      )}
+
+      {!hasMore && movies.length > 0 && (
+        <div style={{ textAlign: "center", padding: "2rem", color: "#666" }}>
+          No more movies to load.
+        </div>
+      )}
+    </div>
+  );
 }
 
-
-export default Home
+export default Home;
