@@ -56,7 +56,8 @@
 }
 
 .search-button:hover {
-  background-color: #f40612;
+  background-color: #ab0c14;
+  border-radius: none;
 }
 
 

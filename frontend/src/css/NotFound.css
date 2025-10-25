@@ -1,0 +1,133 @@
+/* Main container */
+.not-found {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #1a1a1a;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+
+.content {
+    text-align: center;
+    padding: 2rem;
+    animation: fadeIn 0.5s ease-in;
+}
+
+/* 404 Text Styling */
+.not-found h1 {
+    font-size: 8rem;
+    margin: 0;
+    line-height: 1;
+    color: #e50914;
+    text-shadow: 4px 4px 8px rgba(229, 9, 20, 0.3);
+    animation: shake 0.5s ease-in-out;
+}
+
+.not-found .zero {
+    display: inline-block;
+    animation: spin 4s linear infinite;
+    color: #ffffff;
+}
+
+.not-found h2 {
+    font-size: 2.5rem;
+    margin: 1rem 0;
+    color: #ffffff;
+}
+
+.not-found p {
+    font-size: 1.2rem;
+    color: #cccccc;
+    margin-bottom: 2rem;
+}
+
+/* Film Reel Animation */
+.film-reel {
+    margin: 2rem auto;
+    width: 200px;
+    height: 40px;
+    overflow: hidden;
+}
+
+.film {
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(90deg, #333 50%, #444 50%);
+    background-size: 40px 100%;
+    animation: filmMove 2s linear infinite;
+}
+
+.holes {
+    width: 200%;
+    height: 20%;
+    background: 
+        radial-gradient(circle, transparent 6px, #1a1a1a 7px) 0 0,
+        radial-gradient(circle, transparent 6px, #1a1a1a 7px) 20px 0;
+    background-size: 40px 100%;
+    animation: filmMove 2s linear infinite;
+}
+
+/* Home Button */
+.home-button {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background-color: #e50914;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    margin-top: 2rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.home-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(229, 9, 20, 0.3);
+    color: white;
+    background-color: #b10811;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+@keyframes spin {
+    from { transform: rotateY(0deg); }
+    to { transform: rotateY(360deg); }
+}
+
+@keyframes filmMove {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .not-found h1 {
+        font-size: 6rem;
+    }
+    
+    .not-found h2 {
+        font-size: 2rem;
+    }
+    
+    .not-found p {
+        font-size: 1rem;
+    }
+}
