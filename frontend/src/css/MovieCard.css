@@ -7,10 +7,12 @@
   height: 100%;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .movie-card:hover {
   transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 .movie-poster {
@@ -23,6 +25,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 8px 8px 0 0;
 }
 
 .movie-overlay {
@@ -33,19 +36,41 @@
   bottom: 0;
   background: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0.1),
-    rgba(0, 0, 0, 0.8)
+    rgba(0, 0, 0, 0.2),
+    rgba(0, 0, 0, 0.7)
   );
-  opacity: 0;
-  transition: opacity 0.2s;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   padding: 1rem;
 }
 
-.movie-card:hover .movie-overlay {
-  opacity: 1;
+.favorite-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  color: white;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.favorite-btn:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(1.1);
+}
+
+.favorite-btn.active {
+  color: #e50914;
 }
 
 .favorite-btn {

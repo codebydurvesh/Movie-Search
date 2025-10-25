@@ -4,6 +4,23 @@
   box-sizing: border-box;
 }
 
+.movies-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  padding: 1.5rem;
+  max-width: 1920px;
+  margin: 0 auto;
+  width: 98%;
+}
+
+.movies-grid .movie-card {
+  width: 100%;
+  max-width: none;
+  height: auto;
+  margin: 0 auto;
+}
+
 .search-form {
   max-width: 600px;
   margin: 0 auto 2rem;
